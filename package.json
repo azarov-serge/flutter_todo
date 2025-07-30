@@ -1,0 +1,17 @@
+{
+  "name": "@auth-strategy-manager/flutter_todo",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "generate": "fvm flutter pub run build_runner build --delete-conflicting-outputs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
