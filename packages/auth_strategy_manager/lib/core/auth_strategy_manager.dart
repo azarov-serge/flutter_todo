@@ -19,8 +19,12 @@ class AuthStrategyManager {
     await _helper.init();
   }
 
-  Future<Strategy> getStrategy() async {
+  Strategy getStrategy() {
     final name = _helper.activeStrategyName;
+    if (_strategies.length == 1) {
+      return _strategies.values.first;
+    }
+
     if (name == null || !_strategies.containsKey(name)) {
       return _emptyStrategy;
     }

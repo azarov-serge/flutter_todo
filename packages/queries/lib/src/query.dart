@@ -102,6 +102,7 @@ class Query<T> extends AbstractQuery<T> {
         defaultParams: data?.defaultParams ?? state.defaultParams,
         urlParam: data?.urlParam ?? state.urlParam,
         key: data?.key ?? state.key,
+        data: data?.data ?? state.data,
       ),
       initialState: initialState,
     );

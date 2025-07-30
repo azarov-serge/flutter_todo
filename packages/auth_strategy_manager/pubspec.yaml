@@ -31,6 +31,12 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.5.3
+  todo_models:
+    path: ../todo_models
+  todo_api:
+    path: ../todo_api
+  queries:
+    path: ../queries
 
 
 dev_dependencies:

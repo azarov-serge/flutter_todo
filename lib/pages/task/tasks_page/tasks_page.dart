@@ -3,11 +3,11 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:todo_models/todo_models.dart';
 
-import '../../app/store/app_slice/app_slice.dart';
-import '../../app/store/task_slice/task_slice.dart';
-import '../../app/store/fetch_slice/actions/fetch_actions.dart';
-import '../../app/routes.dart';
-import '../../shared/ui_kit/ui_kit.dart';
+import 'package:flutter_todo/app/store/app_slice/app_slice.dart';
+import 'package:flutter_todo/app/store/task_slice/task_slice.dart';
+import 'package:flutter_todo/app/store/fetch_slice/actions/fetch_actions.dart';
+import 'package:flutter_todo/app/routes.dart';
+import 'package:flutter_todo/shared/ui_kit/ui_kit.dart';
 
 /// Страница задач
 class TasksPage extends StatefulWidget {

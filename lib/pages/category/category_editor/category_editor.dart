@@ -3,46 +3,47 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:todo_models/todo_models.dart';
 
-import '../../app/store/app_slice/app_slice.dart';
-import '../../app/store/task_slice/task_slice.dart';
-import '../../app/store/fetch_slice/actions/fetch_actions.dart';
-import '../../shared/ui_kit/ui_kit.dart';
+import 'package:flutter_todo/app/store/app_slice/app_slice.dart';
+import 'package:flutter_todo/app/store/category_slice/category_slice.dart';
+import 'package:flutter_todo/app/store/fetch_slice/actions/fetch_actions.dart';
 
-/// Страница создания/редактирования задачи
-class TaskEditor extends StatefulWidget {
-  /// Задача для редактирования (null для создания новой)
-  final TaskModel? task;
+import 'package:flutter_todo/shared/ui_kit/ui_kit.dart';
 
-  const TaskEditor({super.key, this.task});
+const _userId = '1';
+
+/// Страница создания/редактирования категории
+class CategoryEditor extends StatefulWidget {
+  /// Категория для редактирования (null для создания новой)
+  final CategoryModel? category;
+
+  const CategoryEditor({super.key, this.category});
 
   @override
-  State<TaskEditor> createState() => _TaskEditorState();
+  State<CategoryEditor> createState() => _CategoryEditorState();
 }
 
-class _TaskEditorState extends State<TaskEditor> {
+class _CategoryEditorState extends State<CategoryEditor> {
   late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
   bool _isFetching = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.task?.name ?? '');
-    _descriptionController = TextEditingController(text: '');
+    _nameController = TextEditingController(text: widget.category?.name ?? '');
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _descriptionController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, _TaskEditorViewModel>(
-      converter: (store) => _TaskEditorViewModel.fromStore(store, widget.task),
+    return StoreConnector<AppState, _CategoryEditorViewModel>(
+      converter: (store) =>
+          _CategoryEditorViewModel.fromStore(store, widget.category),
       builder: (context, viewModel) {
         return ErrorWrapper(
           error: _error,
@@ -58,10 +59,12 @@ class _TaskEditorState extends State<TaskEditor> {
   }
 
   /// Строим контент страницы
-  Widget _buildContent(_TaskEditorViewModel viewModel) {
+  Widget _buildContent(_CategoryEditorViewModel viewModel) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.task == null ? 'Create task' : 'Edit task'),
+        title: Text(
+          widget.category == null ? 'Create category' : 'Edit category',
+        ),
         actions: [
           if (_isFetching)
             const Padding(
@@ -74,7 +77,7 @@ class _TaskEditorState extends State<TaskEditor> {
             )
           else
             TextButton(
-              onPressed: _canSave() ? _saveTask : null,
+              onPressed: _canSave() ? _saveCategory : null,
               child: const Text('Save', style: TextStyle(color: Colors.white)),
             ),
         ],
@@ -84,7 +87,7 @@ class _TaskEditorState extends State<TaskEditor> {
   }
 
   /// Строим форму
-  Widget _buildForm(_TaskEditorViewModel viewModel) {
+  Widget _buildForm(_CategoryEditorViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -94,41 +97,26 @@ class _TaskEditorState extends State<TaskEditor> {
           TextField(
             controller: _nameController,
             decoration: const InputDecoration(
-              labelText: 'Task name *',
+              labelText: 'Category name *',
               border: OutlineInputBorder(),
-              hintText: 'Enter task name',
+              hintText: 'Enter category name',
             ),
             onChanged: (value) {
               setState(() {});
             },
             autofocus: true,
           ),
-          const SizedBox(height: 16),
-
-          // Поле описания
-          TextField(
-            controller: _descriptionController,
-            decoration: const InputDecoration(
-              labelText: 'Description',
-              border: OutlineInputBorder(),
-              hintText: 'Enter task description (optional)',
-            ),
-            maxLines: 4,
-            onChanged: (value) {
-              setState(() {});
-            },
-          ),
           const SizedBox(height: 24),
 
-          // Информация о задаче (если редактирование)
-          if (widget.task != null) ...[
-            _buildTaskInfo(widget.task!),
+          // Информация о категории (если редактирование)
+          if (widget.category != null) ...[
+            _buildCategoryInfo(widget.category!),
             const SizedBox(height: 24),
           ],
 
           // Кнопка сохранения
           ElevatedButton(
-            onPressed: _canSave() && !_isFetching ? _saveTask : null,
+            onPressed: _canSave() && !_isFetching ? _saveCategory : null,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
@@ -150,15 +138,19 @@ class _TaskEditorState extends State<TaskEditor> {
                       Text('Saving...'),
                     ],
                   )
-                : Text(widget.task == null ? 'Create task' : 'Save changes'),
+                : Text(
+                    widget.category == null
+                        ? 'Create category'
+                        : 'Save changes',
+                  ),
           ),
         ],
       ),
     );
   }
 
-  /// Строим информацию о задаче
-  Widget _buildTaskInfo(TaskModel task) {
+  /// Строим информацию о категории
+  Widget _buildCategoryInfo(CategoryModel category) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -166,15 +158,15 @@ class _TaskEditorState extends State<TaskEditor> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Task information',
+              'Category information',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            _buildInfoRow('ID', task.id),
-            _buildInfoRow('Created', _formatDate(task.createdAt)),
+            _buildInfoRow('ID', category.id),
+            _buildInfoRow('Created', _formatDate(category.createdAt)),
             _buildInfoRow(
-              'Category',
-              task.categoryId.isEmpty ? 'No category' : task.categoryId,
+              'User',
+              category.userId.isEmpty ? 'No user' : category.userId,
             ),
           ],
         ),
@@ -215,8 +207,8 @@ class _TaskEditorState extends State<TaskEditor> {
     return _nameController.text.trim().isNotEmpty;
   }
 
-  /// Сохраняем задачу
-  void _saveTask() async {
+  /// Сохраняем категорию
+  void _saveCategory() async {
     if (!_canSave()) return;
 
     setState(() {
@@ -226,30 +218,48 @@ class _TaskEditorState extends State<TaskEditor> {
 
     try {
       final store = StoreProvider.of<AppState>(context, listen: false);
-      final taskSlice = TaskSlice();
+      final categorySlice = CategorySlice();
 
-      final taskData = TaskModel.createEmpty().copyWith(
+      final categoryData = CategoryModel.createEmpty().copyWith(
         name: _nameController.text.trim(),
+        userId: _userId,
       );
 
-      if (widget.task == null) {
-        // Создание новой задачи
-        store.dispatch(taskSlice.thunks.createTask(taskData));
+      if (widget.category == null) {
+        // Создание новой категории
+        store.dispatch(categorySlice.thunks.createCategory(categoryData));
+
+        // Показываем уведомление об успешном создании
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Category created successfully!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       } else {
-        // Обновление существующей задачи
-        final updatedTask = widget.task!.copyWith(
+        // Обновление существующей категории
+        final updatedCategory = widget.category!.copyWith(
           name: _nameController.text.trim(),
         );
-        store.dispatch(taskSlice.thunks.updateTask(updatedTask));
-      }
+        store.dispatch(categorySlice.thunks.updateCategory(updatedCategory));
 
-      // Возвращаемся назад
-      if (mounted) {
-        Navigator.of(context).pop();
+        // Показываем уведомление об успешном обновлении
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Category updated successfully!'),
+              backgroundColor: Colors.blue,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
     } catch (e) {
       setState(() {
-        _error = 'Error saving task: ${e.toString()}';
+        _error = 'Error saving category: ${e.toString()}';
       });
     } finally {
       if (mounted) {
@@ -261,41 +271,43 @@ class _TaskEditorState extends State<TaskEditor> {
   }
 }
 
-/// ViewModel для страницы редактирования задачи
-class _TaskEditorViewModel {
+/// ViewModel для страницы редактирования категории
+class _CategoryEditorViewModel {
   final bool isFetching;
   final String? error;
-  final Function(TaskModel) createTask;
-  final Function(TaskModel) updateTask;
+  final Function(CategoryModel) createCategory;
+  final Function(CategoryModel) updateCategory;
   final VoidCallback clearError;
 
-  _TaskEditorViewModel({
+  _CategoryEditorViewModel({
     required this.isFetching,
     required this.error,
-    required this.createTask,
-    required this.updateTask,
+    required this.createCategory,
+    required this.updateCategory,
     required this.clearError,
   });
 
-  factory _TaskEditorViewModel.fromStore(
+  factory _CategoryEditorViewModel.fromStore(
     Store<AppState> store,
-    TaskModel? task,
+    CategoryModel? category,
   ) {
-    final taskSlice = TaskSlice();
+    final categorySlice = CategorySlice();
     final fetchState = store.state.fetchState;
 
     // Определяем ключ для статуса
-    final statusKey = task == null ? 'create_task' : 'update_task_${task.id}';
+    final statusKey = category == null
+        ? 'create_category'
+        : 'update_category_${category.id}';
 
-    return _TaskEditorViewModel(
+    return _CategoryEditorViewModel(
       isFetching: fetchState.status(statusKey).isFetching,
       error: fetchState.status(statusKey).error.isNotEmpty
           ? fetchState.status(statusKey).error
           : null,
-      createTask: (taskData) =>
-          store.dispatch(taskSlice.thunks.createTask(taskData)),
-      updateTask: (taskData) =>
-          store.dispatch(taskSlice.thunks.updateTask(taskData)),
+      createCategory: (categoryData) =>
+          store.dispatch(categorySlice.thunks.createCategory(categoryData)),
+      updateCategory: (categoryData) =>
+          store.dispatch(categorySlice.thunks.updateCategory(categoryData)),
       clearError: () => store.dispatch(FetchClearErrorAction(statusKey)),
     );
   }

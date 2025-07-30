@@ -13,13 +13,14 @@ class AppRoutes {
   static const String tasks = '/tasks';
   static const String taskCreate = '/tasks/create';
   static const String taskEdit = '/tasks/edit';
+  static const String auth = '/auth';
 
   /// Генератор роутов
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
         return MaterialPageRoute(
-          builder: (_) => const CategoriesPage(),
+          builder: (_) => const HomePage(),
           settings: settings,
         );
 
@@ -56,9 +57,15 @@ class AppRoutes {
           settings: settings,
         );
 
+      case auth:
+        return MaterialPageRoute(
+          builder: (_) => const AuthPage(),
+          settings: settings,
+        );
+
       default:
         return MaterialPageRoute(
-          builder: (_) => const CategoriesPage(),
+          builder: (_) => const HomePage(),
           settings: settings,
         );
     }

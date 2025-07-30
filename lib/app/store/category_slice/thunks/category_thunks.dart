@@ -99,7 +99,6 @@ class CategoryThunks {
 
   /// Обновление категории
   ThunkAction<AppState> updateCategory(CategoryModel category) {
-    print('updateCategory: $category');
     return (Store<AppState> store) async {
       final query = Query<CategoryModel>(
         state: QueryState<CategoryModel>(
@@ -115,7 +114,7 @@ class CategoryThunks {
         key: query.state.key,
         operation: () async {
           final updatedCategory = await categoryApi.update(query);
-          print('updatedCategory: $updatedCategory');
+
           store.dispatch(UpdateCategoryAction(updatedCategory));
         },
       );

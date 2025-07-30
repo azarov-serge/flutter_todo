@@ -14,7 +14,7 @@ Reducer<FetchState> fetchReducer = (state, action) {
         action.key: status.copyWith(
           isFetching: true,
           isFetched: false,
-          error: null,
+          error: '',
         ),
       },
     );

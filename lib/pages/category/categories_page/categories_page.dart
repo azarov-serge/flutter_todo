@@ -3,11 +3,11 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:todo_models/todo_models.dart';
 
-import '../../app/store/app_slice/app_slice.dart';
-import '../../app/store/category_slice/category_slice.dart';
-import '../../app/store/fetch_slice/actions/fetch_actions.dart';
-import '../../app/routes.dart';
-import '../../shared/ui_kit/ui_kit.dart';
+import '../../../app/store/app_slice/app_slice.dart';
+import '../../../app/store/category_slice/category_slice.dart';
+import '../../../app/store/fetch_slice/actions/fetch_actions.dart';
+import '../../../app/routes.dart';
+import '../../../shared/ui_kit/ui_kit.dart';
 
 const userId = '1';
 
@@ -53,7 +53,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   /// Строим контент страницы
   Widget _buildContent(_CategoriesViewModel viewModel) {
-    if (viewModel.isLoading) {
+    if (viewModel.isFetching) {
       return SplashScreen(message: 'Loading categories...');
     }
 
@@ -214,7 +214,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 /// ViewModel для страницы категорий
 class _CategoriesViewModel {
   final List<CategoryModel> categories;
-  final bool isLoading;
+  final bool isFetching;
   final String? error;
   final Function(String) loadCategories;
   final Function(CategoryModel) createCategory;
@@ -224,7 +224,7 @@ class _CategoriesViewModel {
 
   _CategoriesViewModel({
     required this.categories,
-    required this.isLoading,
+    required this.isFetching,
     required this.error,
     required this.loadCategories,
     required this.createCategory,
@@ -239,7 +239,7 @@ class _CategoriesViewModel {
 
     return _CategoriesViewModel(
       categories: categorySlice.getCategories(store.state.categoryState),
-      isLoading: fetchState
+      isFetching: fetchState
           .status(categorySlice.thunks.categoriesQuery.state.key)
           .isFetching,
       error:
