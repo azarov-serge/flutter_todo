@@ -133,6 +133,14 @@ class AuthApiImpl implements AuthApi {
     }
   }
 
+  @override
+  Future<void> updateRefreshToken() async {
+    final authItems = _hiveClient.authBox.values;
+    if (authItems.isNotEmpty) {
+      await _refreshToken(authItems.first.userId);
+    }
+  }
+
   /// Обновляет токен аутентификации
   Future<void> _refreshToken(String userId) async {
     await Future.delayed(const Duration(milliseconds: 100));
@@ -210,3 +218,5 @@ class AuthApiImpl implements AuthApi {
     return userHive;
   }
 }
+
+final authApi = AuthApiImpl();

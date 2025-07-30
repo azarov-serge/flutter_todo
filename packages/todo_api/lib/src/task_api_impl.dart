@@ -5,13 +5,17 @@ import 'package:todo_api/src/abstract_api/abstract_api.dart';
 import 'package:todo_api/src/hive_client/hive_client.dart';
 import 'package:todo_api/src/hive_client/hive_models/task_hive_model.dart';
 
+import 'auth_api_impl.dart';
+
 class TaskApiImpl implements TaskApi {
   final HiveClient _hiveClient = hiveClient;
+  final AuthApi _authApi = authApi;
+
   @override
   Future<List<TaskModel>> fetchList(Query<String> query) async {
-    final categoryId = query.state.data;
+    final categoryId = query.state.urlParam;
 
-    if (categoryId == null) {
+    if (categoryId.isEmpty) {
       throw Exception('Category ID is null');
     }
 
@@ -39,6 +43,8 @@ class TaskApiImpl implements TaskApi {
       });
     }
 
+    await _authApi.updateRefreshToken();
+
     return tasks;
   }
 
@@ -58,6 +64,8 @@ class TaskApiImpl implements TaskApi {
       throw Exception('Task not found');
     }
 
+    await _authApi.updateRefreshToken();
+
     return TaskModel.fromJson(task.toJson());
   }
 
@@ -74,6 +82,8 @@ class TaskApiImpl implements TaskApi {
     final newTask = TaskHiveModel(name: task.name, categoryId: task.categoryId);
 
     _hiveClient.tasksBox.put(newTask.id, newTask);
+
+    await _authApi.updateRefreshToken();
 
     return TaskModel.fromJson(newTask.toJson());
   }
@@ -103,6 +113,8 @@ class TaskApiImpl implements TaskApi {
 
     _hiveClient.tasksBox.put(updatedTask.id, updatedTask);
 
+    await _authApi.updateRefreshToken();
+
     return TaskModel.fromJson(updatedTask.toJson());
   }
 
@@ -117,5 +129,7 @@ class TaskApiImpl implements TaskApi {
     await Future.delayed(const Duration(milliseconds: 900));
 
     _hiveClient.tasksBox.delete(taskId);
+
+    await _authApi.updateRefreshToken();
   }
 }

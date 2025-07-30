@@ -5,8 +5,12 @@ import 'package:todo_api/src/abstract_api/abstract_api.dart';
 import 'package:todo_api/src/hive_client/hive_client.dart';
 import 'package:todo_api/src/hive_client/hive_models/category_hive_model.dart';
 
+import 'auth_api_impl.dart';
+
 class CategoryApiImpl implements CategoryApi {
   final HiveClient _hiveClient = hiveClient;
+  final AuthApi _authApi = authApi;
+
   @override
   Future<List<CategoryModel>> fetchList(Query<String> query) async {
     final userId = query.state.urlParam;
@@ -39,15 +43,17 @@ class CategoryApiImpl implements CategoryApi {
       });
     }
 
+    await _authApi.updateRefreshToken();
+
     return categories;
   }
 
   @override
   Future<CategoryModel> fetchItem(Query<String> query) async {
-    final categoryId = query.state.data;
+    final categoryId = query.state.urlParam;
 
-    if (categoryId == null) {
-      throw Exception('Category ID is null');
+    if (categoryId.isEmpty) {
+      throw Exception('Category ID is invalid');
     }
 
     await Future.delayed(const Duration(milliseconds: 900));
@@ -57,6 +63,8 @@ class CategoryApiImpl implements CategoryApi {
     if (category == null) {
       throw Exception('Category not found');
     }
+
+    await _authApi.updateRefreshToken();
 
     return CategoryModel.fromJson(category.toJson());
   }
@@ -77,6 +85,8 @@ class CategoryApiImpl implements CategoryApi {
     );
 
     _hiveClient.categoriesBox.put(newCategory.id, newCategory);
+
+    await _authApi.updateRefreshToken();
 
     return CategoryModel.fromJson(newCategory.toJson());
   }
@@ -106,6 +116,8 @@ class CategoryApiImpl implements CategoryApi {
 
     await _hiveClient.categoriesBox.put(updatedCategory.id, updatedCategory);
 
+    await _authApi.updateRefreshToken();
+
     return CategoryModel.fromJson(updatedCategory.toJson());
   }
 
@@ -118,7 +130,6 @@ class CategoryApiImpl implements CategoryApi {
     }
 
     await Future.delayed(const Duration(milliseconds: 900));
-
     _hiveClient.categoriesBox.delete(categoryId);
   }
 }

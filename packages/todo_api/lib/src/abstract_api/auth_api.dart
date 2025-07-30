@@ -12,4 +12,7 @@ abstract class AuthApi {
   Future<String> signUp(Query<SignUpData> query);
 
   Future<void> signOut(Query<String> query);
+
+  /// Refresh token
+  Future<void> updateRefreshToken();
 }

@@ -8,8 +8,11 @@ import 'package:todo_api/src/abstract_api/abstract_api.dart';
 import 'package:todo_api/src/hive_client/hive_client.dart';
 import 'package:todo_api/src/hive_client/hive_models/user_hive_model.dart';
 
+import 'auth_api_impl.dart';
+
 class UserApiImpl implements UserApi {
   final HiveClient _hiveClient = hiveClient;
+  final AuthApi _authApi = authApi;
 
   @override
   Future<List<UserModel>> fetchList(Query<Null> query) async {
@@ -24,10 +27,10 @@ class UserApiImpl implements UserApi {
 
   @override
   Future<UserModel> fetchItem(Query<String> query) async {
-    final userId = query.state.data;
+    final userId = query.state.urlParam;
 
-    if (userId == null) {
-      throw Exception('User ID is null');
+    if (userId.isEmpty) {
+      throw Exception('User ID is invalid');
     }
 
     await Future.delayed(const Duration(milliseconds: 500));
@@ -145,6 +148,8 @@ class UserApiImpl implements UserApi {
     for (final auth in authItems) {
       _hiveClient.authBox.delete(auth.id);
     }
+
+    await _authApi.updateRefreshToken();
 
     return true;
   }

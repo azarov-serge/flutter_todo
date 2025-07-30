@@ -1,143 +1,71 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_todo/app/store/app_slice/app_slice.dart';
-import 'package:flutter_todo/app/store/auth_slice/auth_slice.dart';
-import 'package:flutter_todo/app/routes.dart';
-import 'package:flutter_todo/shared/get_it/get_it.dart';
-import 'package:flutter_todo/shared/ui_kit/splash_screen/splash_screen.dart';
-import 'package:todo_models/todo_models.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Виджет для проверки авторизации пользователя
-/// Если пользователь авторизован - показывает child
-/// Если не авторизован - редиректит на страницу авторизации
-class Verifier extends StatefulWidget {
+import '../../../features/auth/providers/auth_notifier.dart';
+import '../../../features/auth/providers/auth_query.dart';
+import '../../../features/auth/views/auth_page/auth_page.dart';
+import '../../../shared/providers/request_provider.dart';
+import '../../../shared/ui_kit/ui_kit.dart';
+
+/// Verifier widget for authentication verification
+/// Shows loading indicator while checking authentication
+/// Redirects to auth page if not authenticated
+class Verifier extends ConsumerStatefulWidget {
   final Widget child;
 
   const Verifier({super.key, required this.child});
 
   @override
-  State<Verifier> createState() => _VerifierState();
+  ConsumerState<Verifier> createState() => _VerifierState();
 }
 
-class _VerifierState extends State<Verifier> {
-  bool _isChecking = true;
+class _VerifierState extends ConsumerState<Verifier> {
+  bool _hasCheckedAuth = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    // Check authentication on init
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuth();
+    });
   }
 
-  /// Проверка авторизации
-  void _checkAuth() async {
-    final authSlice = getIt.get<AuthSlice>();
-    authSlice.thunks.checkAuth();
+  /// Check authentication status
+  Future<void> _checkAuth() async {
+    if (!_hasCheckedAuth) {
+      _hasCheckedAuth = true;
 
-    if (mounted) {
-      setState(() {
-        _isChecking = false;
-      });
+      await ref.read(authNotifierProvider.notifier).checkAuth();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, VerifierViewModel>(
-      converter: (store) => VerifierViewModel.fromStore(store),
-      builder: (context, vm) {
-        // Показываем SplashScreen во время проверки
-        if (_isChecking) {
-          return SplashScreen(message: 'Verifying authentication...');
-        }
+    final isAuthenticated = ref.watch(isAuthenticatedProvider);
 
-        // Если пользователь авторизован, показываем child
-        if (vm.isAuthenticated) {
-          return widget.child;
-        }
+    // Get loading state from RequestNotifier using AuthQuery.checkAuth() key
+    final checkAuthQuery = AuthQuery.checkAuth();
+    final requestKey = checkAuthQuery.state.key;
 
-        // Если пользователь не авторизован, редиректим на auth page
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _navigateToAuth();
-        });
+    final requestState = ref.watch(requestStateProvider(requestKey));
 
-        // Показываем SplashScreen во время редиректа
-        return SplashScreen(message: 'Redirecting to login...');
-      },
-    );
-  }
-
-  /// Навигация на страницу авторизации
-  void _navigateToAuth() {
-    try {
-      // Сначала пробуем локальную навигацию
-      final navigator = Navigator.maybeOf(context);
-      if (navigator != null) {
-        navigator.pushReplacementNamed(AppRoutes.auth);
-        return;
-      }
-
-      // Если локальная навигация недоступна, используем глобальный ключ
-      _navigateWithGlobalKey();
-    } catch (e) {
-      _navigateWithGlobalKey();
+    final isLoading = requestState.isLoading;
+    // Show loading while checking authentication
+    if (isLoading) {
+      return const SplashScreen(
+        message: 'Checking authentication...',
+        spinnerSize: 28,
+        spinnerColor: Colors.blue,
+      );
     }
-  }
 
-  /// Навигация с использованием глобального ключа
-  void _navigateWithGlobalKey() {
-    try {
-      if (getIt.isRegistered<GlobalKey<NavigatorState>>()) {
-        final navigatorKey = getIt.get<GlobalKey<NavigatorState>>();
-        if (navigatorKey.currentState != null) {
-          navigatorKey.currentState!.pushReplacementNamed(AppRoutes.auth);
-          return;
-        }
-      }
-
-      // Если глобальный ключ недоступен, пробуем с задержкой
-      _retryNavigationWithDelay();
-    } catch (e) {
-      _retryNavigationWithDelay();
+    // Show auth page if not authenticated
+    if (!isAuthenticated) {
+      return const AuthPage();
     }
-  }
 
-  /// Повторная попытка навигации с задержкой
-  void _retryNavigationWithDelay() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        _navigateToAuth();
-      }
-    });
-  }
-}
-
-/// ViewModel для Verifier виджета
-class VerifierViewModel {
-  final UserModel? currentUser;
-  final bool isAuthenticated;
-  final String? token;
-  final String? error;
-  final bool hasError;
-
-  VerifierViewModel({
-    required this.currentUser,
-    required this.isAuthenticated,
-    required this.token,
-    required this.error,
-    required this.hasError,
-  });
-
-  factory VerifierViewModel.fromStore(Store<AppState> store) {
-    final authSlice = getIt.get<AuthSlice>();
-    final authStatus = authSlice.checkAuthStatus(store);
-
-    return VerifierViewModel(
-      currentUser: authSlice.getState(store).currentUser,
-      isAuthenticated: authSlice.getState(store).isAuthenticated,
-      token: authSlice.getState(store).token,
-      error: authStatus.error,
-      hasError: authStatus.error.isNotEmpty,
-    );
+    // Show child widget if authenticated
+    return widget.child;
   }
 }

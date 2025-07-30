@@ -21,7 +21,7 @@ abstract class AbstractQuery<T> {
   }
 
   // Метод для копирования (должен быть реализован в наследниках)
-  Query<T> copyWith(QueryState<T> data);
+  Query<T> copyWith(Query<T> data);
 
   // Создание URL
   String createUrl([QueryParams? params]) {
@@ -92,18 +92,9 @@ class Query<T> extends AbstractQuery<T> {
   Query({required super.state, super.initialState});
 
   @override
-  Query<T> copyWith(QueryState<T>? data) {
+  Query<T> copyWith(Query<T>? data) {
     return Query(
-      state: state.copyWith(
-        id: data?.id ?? state.id,
-        baseUrl: data?.baseUrl ?? state.baseUrl,
-        method: data?.method ?? state.method,
-        params: data?.params ?? state.params,
-        defaultParams: data?.defaultParams ?? state.defaultParams,
-        urlParam: data?.urlParam ?? state.urlParam,
-        key: data?.key ?? state.key,
-        data: data?.data ?? state.data,
-      ),
+      state: data?.state ?? state,
       initialState: initialState,
     );
   }

@@ -56,11 +56,13 @@ class PersistStrategy implements Strategy {
       throw Exception('Config is required');
     }
     // Извлекаем данные из конфига
-    if (config is! Query) {
+    if (config is! SignInData) {
       throw Exception('Invalid config format');
     }
 
-    final query = config as Query<SignInData>;
+    final query = Query<SignInData>(
+      state: QueryState(baseUrl: signInUrl, method: 'POST', data: config),
+    );
 
     final userId = await _authApi.signIn(query);
     _setToken(userId);

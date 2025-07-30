@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:todo_models/todo_models.dart';
 
-import '../pages/pages.dart';
+import '../features/shared/home/home_page.dart';
+import '../features/categories/views/category_editor_page/category_editor_page.dart';
+import '../features/tasks/views/tasks_page/tasks_page.dart';
+import '../features/tasks/views/task_editor/task_editor.dart';
+import '../features/auth/views/auth_page/auth_page.dart';
 
-/// Класс для управления роутами приложения
+/// Application routes management class
 class AppRoutes {
-  // Основные роуты
+  // Main routes
   static const String home = '/';
   static const String categories = '/';
   static const String categoryCreate = '/create';
@@ -15,7 +19,7 @@ class AppRoutes {
   static const String taskEdit = '/tasks/edit';
   static const String auth = '/auth';
 
-  /// Генератор роутов
+  /// Route generator
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
@@ -26,14 +30,14 @@ class AppRoutes {
 
       case categoryCreate:
         return MaterialPageRoute(
-          builder: (_) => const CategoryEditor(),
+          builder: (_) => const CategoryEditorPage(categoryId: ''),
           settings: settings,
         );
 
       case categoryEdit:
-        final category = settings.arguments as CategoryModel;
+        final categoryId = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => CategoryEditor(category: category),
+          builder: (_) => CategoryEditorPage(categoryId: categoryId),
           settings: settings,
         );
 
@@ -46,14 +50,14 @@ class AppRoutes {
 
       case taskCreate:
         return MaterialPageRoute(
-          builder: (_) => const TaskEditor(),
+          builder: (_) => const TaskEditor(taskId: ''),
           settings: settings,
         );
 
       case taskEdit:
-        final task = settings.arguments as TaskModel;
+        final taskId = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => TaskEditor(task: task),
+          builder: (_) => TaskEditor(taskId: taskId),
           settings: settings,
         );
 
@@ -71,47 +75,52 @@ class AppRoutes {
     }
   }
 
-  /// Навигация к домашней странице (категории)
+  /// Navigate to home page (categories)
   static void goHome(BuildContext context) {
     Navigator.of(context).pushNamedAndRemoveUntil(home, (route) => false);
   }
 
-  /// Навигация к списку категорий
+  /// Navigate to categories list
   static void goToCategories(BuildContext context) {
     Navigator.of(context).pushNamed(categories);
   }
 
-  /// Навигация к созданию категории
+  /// Navigate to create category
   static void goToCreateCategory(BuildContext context) {
     Navigator.of(context).pushNamed(categoryCreate);
   }
 
-  /// Навигация к редактированию категории
-  static void goToEditCategory(BuildContext context, CategoryModel category) {
-    Navigator.of(context).pushNamed(categoryEdit, arguments: category);
+  /// Navigate to edit category
+  static void goToEditCategory(BuildContext context, String categoryId) {
+    Navigator.of(context).pushNamed(categoryEdit, arguments: categoryId);
   }
 
-  /// Навигация к списку задач
+  /// Navigate to tasks list
   static void goToTasks(BuildContext context, {String? categoryId}) {
     Navigator.of(context).pushNamed(tasks, arguments: categoryId);
   }
 
-  /// Навигация к созданию задачи
+  /// Navigate to create task
   static void goToCreateTask(BuildContext context) {
     Navigator.of(context).pushNamed(taskCreate);
   }
 
-  /// Навигация к редактированию задачи
+  /// Navigate to edit task
   static void goToEditTask(BuildContext context, TaskModel task) {
-    Navigator.of(context).pushNamed(taskEdit, arguments: task);
+    Navigator.of(context).pushNamed(taskEdit, arguments: task.id);
   }
 
-  /// Навигация назад
+  /// Navigate to auth page
+  static void goToAuth(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(auth, (route) => false);
+  }
+
+  /// Navigate back
   static void goBack(BuildContext context) {
     Navigator.of(context).pop();
   }
 
-  /// Навигация назад с результатом
+  /// Navigate back with result
   static void goBackWithResult(BuildContext context, dynamic result) {
     Navigator.of(context).pop(result);
   }

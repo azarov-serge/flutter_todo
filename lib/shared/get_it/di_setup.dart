@@ -1,14 +1,14 @@
 import 'get_it.dart';
 
-/// Настройка dependency injection
+/// Dependency injection setup
 class DISetup {
-  /// Инициализация всех зависимостей
+  /// Initialize all dependencies
   static Future<void> setup() async {
-    await initializeDependencies();
+    await setupDependencies();
   }
 
-  /// Очистка зависимостей (для тестов)
+  /// Clear dependencies (for testing)
   static Future<void> reset() async {
-    await resetDependencies();
+    await clearDependencies();
   }
 }
