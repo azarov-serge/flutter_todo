@@ -7,7 +7,7 @@ import '../../../providers/auth_notifier.dart';
 import '../../../../../shared/providers/request_provider.dart';
 import '../../../../../shared/ui_kit/error_wrapper/error_wrapper.dart';
 
-/// Виджет формы регистрации
+/// Sign up form widget
 class SignUpForm extends StatefulWidget {
   final TabController tabController;
 
@@ -22,7 +22,7 @@ class _SignUpFormState extends State<SignUpForm> {
   late TextEditingController _passwordController;
   late TextEditingController _confirmPasswordController;
 
-  // Состояния для валидации
+  // Validation states
   String? _loginError;
   String? _passwordError;
   String? _confirmPasswordError;
@@ -63,7 +63,7 @@ class _SignUpFormState extends State<SignUpForm> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Форма регистрации
+                // Sign up form
                 Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
@@ -80,9 +80,9 @@ class _SignUpFormState extends State<SignUpForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Заголовок формы
+                      // Form header
                       const Text(
-                        'Create Account',
+                        'Sign Up',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -92,7 +92,7 @@ class _SignUpFormState extends State<SignUpForm> {
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Register for a new account',
+                        'Create a new account',
                         style: TextStyle(
                           fontSize: 13,
                           color: Color(0xFF666666),
@@ -101,96 +101,63 @@ class _SignUpFormState extends State<SignUpForm> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Поле логина
+                      // Username field
                       TextField(
                         controller: _loginController,
-                        enabled: !requestState.isLoading,
                         onChanged: (value) => _validateLogin(value),
                         decoration: InputDecoration(
-                          labelText: 'Login',
-                          prefixIcon: const Icon(Icons.person_outline),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          labelText: 'Username',
+                          prefixIcon: const Icon(Icons.person),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF667eea),
-                              width: 2,
-                            ),
-                          ),
+                          enabled: !requestState.isLoading,
                           errorText: _loginError,
-                          errorBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(color: Colors.red, width: 2),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
 
-                      // Поле пароля
+                      // Password field
                       TextField(
                         controller: _passwordController,
-                        enabled: !requestState.isLoading,
-                        obscureText: true,
                         onChanged: (value) => _validatePassword(value),
+                        obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          prefixIcon: const Icon(Icons.lock),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF667eea),
-                              width: 2,
-                            ),
-                          ),
+                          enabled: !requestState.isLoading,
                           errorText: _passwordError,
-                          errorBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(color: Colors.red, width: 2),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
 
-                      // Поле подтверждения пароля
+                      // Password confirmation field
                       TextField(
                         controller: _confirmPasswordController,
-                        enabled: !requestState.isLoading,
-                        obscureText: true,
                         onChanged: (value) => _validateConfirmPassword(value),
+                        obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Confirm Password',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          prefixIcon: const Icon(Icons.lock),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF667eea),
-                              width: 2,
-                            ),
-                          ),
+                          enabled: !requestState.isLoading,
                           errorText: _confirmPasswordError,
-                          errorBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(color: Colors.red, width: 2),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      // Кнопка регистрации
+                      // Sign up button
                       SizedBox(
                         height: 48,
                         child: ElevatedButton(
                           onPressed: requestState.isLoading ? null : _signUp,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF667eea),
+                            backgroundColor: Theme.of(context).primaryColor,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -208,7 +175,7 @@ class _SignUpFormState extends State<SignUpForm> {
                                   ),
                                 )
                               : const Text(
-                                  'Register',
+                                  'Sign Up',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -221,7 +188,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
                 const SizedBox(height: 16),
 
-                // Ссылка на вход
+                // Link to sign in
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -236,7 +203,7 @@ class _SignUpFormState extends State<SignUpForm> {
                               widget.tabController.animateTo(0);
                             },
                       child: const Text(
-                        'Login',
+                        'Sign In',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -254,18 +221,18 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
-  /// Регистрация в системе
+  /// Sign up to the system
   void _signUp() {
     final login = _loginController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
-    // Запускаем валидацию всех полей
+    // Validate all fields
     _validateLogin(login);
     _validatePassword(password);
     _validateConfirmPassword(confirmPassword);
 
-    // Проверяем, есть ли ошибки валидации
+    // Check if there are validation errors
     if (_loginError != null ||
         _passwordError != null ||
         _confirmPasswordError != null) {
@@ -273,15 +240,15 @@ class _SignUpFormState extends State<SignUpForm> {
       return;
     }
 
-    // Создаем данные для регистрации
+    // Create sign up data
     final signUpData = SignUpData(login: login, password: password);
 
-    // Выполняем регистрацию через Riverpod
+    // Perform sign up through Riverpod
     final container = ProviderScope.containerOf(context);
     container.read(authNotifierProvider.notifier).signUp(signUpData);
   }
 
-  /// Показать ошибку валидации
+  /// Show validation error
   void _showValidationError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -293,20 +260,20 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
-  /// Валидация логина
+  /// Validate login
   void _validateLogin(String value) {
     setState(() {
       if (value.isEmpty) {
-        _loginError = 'Login is required';
+        _loginError = 'Username is required';
       } else if (value.length < 3) {
-        _loginError = 'Login must be at least 3 characters';
+        _loginError = 'Username must be at least 3 characters';
       } else {
         _loginError = null;
       }
     });
   }
 
-  /// Валидация пароля
+  /// Validate password
   void _validatePassword(String value) {
     setState(() {
       if (value.isEmpty) {
@@ -316,12 +283,12 @@ class _SignUpFormState extends State<SignUpForm> {
       } else {
         _passwordError = null;
       }
-      // Также валидируем подтверждение пароля
+      // Also validate password confirmation
       _validateConfirmPassword(_confirmPasswordController.text);
     });
   }
 
-  /// Валидация подтверждения пароля
+  /// Validate password confirmation
   void _validateConfirmPassword(String value) {
     setState(() {
       if (value.isEmpty) {
