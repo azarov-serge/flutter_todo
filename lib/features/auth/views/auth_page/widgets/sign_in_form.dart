@@ -7,7 +7,7 @@ import '../../../providers/auth_notifier.dart';
 import '../../../../../shared/providers/request_provider.dart';
 import '../../../../../shared/ui_kit/error_wrapper/error_wrapper.dart';
 
-/// Виджет формы входа
+/// Sign in form widget
 class SignInForm extends StatefulWidget {
   final TabController tabController;
 
@@ -21,7 +21,7 @@ class _SignInFormState extends State<SignInForm> {
   late TextEditingController _loginController;
   late TextEditingController _passwordController;
 
-  // Состояния для валидации
+  // Validation states
   String? _loginError;
   String? _passwordError;
 
@@ -59,7 +59,7 @@ class _SignInFormState extends State<SignInForm> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Форма входа
+                // Sign in form
                 Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
@@ -76,9 +76,9 @@ class _SignInFormState extends State<SignInForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Заголовок формы
+                      // Form header
                       const Text(
-                        'Welcome!',
+                        'Sign In',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -88,7 +88,7 @@ class _SignInFormState extends State<SignInForm> {
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Login to your account',
+                        'Sign in to your account',
                         style: TextStyle(
                           fontSize: 13,
                           color: Color(0xFF666666),
@@ -97,68 +97,46 @@ class _SignInFormState extends State<SignInForm> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Поле логина
+                      // Username field
                       TextField(
                         controller: _loginController,
-                        enabled: !requestState.isLoading,
                         onChanged: (value) => _validateLogin(value),
                         decoration: InputDecoration(
-                          labelText: 'Login',
-                          prefixIcon: const Icon(Icons.person_outline),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          labelText: 'Username',
+                          prefixIcon: const Icon(Icons.person),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF667eea),
-                              width: 2,
-                            ),
-                          ),
+                          enabled: !requestState.isLoading,
                           errorText: _loginError,
-                          errorBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(color: Colors.red, width: 2),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
 
-                      // Поле пароля
+                      // Password field
                       TextField(
                         controller: _passwordController,
-                        enabled: !requestState.isLoading,
-                        obscureText: true,
                         onChanged: (value) => _validatePassword(value),
+                        obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          prefixIcon: const Icon(Icons.lock),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF667eea),
-                              width: 2,
-                            ),
-                          ),
+                          enabled: !requestState.isLoading,
                           errorText: _passwordError,
-                          errorBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(color: Colors.red, width: 2),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      // Кнопка входа
+                      // Sign in button
                       SizedBox(
                         height: 48,
                         child: ElevatedButton(
                           onPressed: requestState.isLoading ? null : _signIn,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF667eea),
+                            backgroundColor: Theme.of(context).primaryColor,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -176,7 +154,7 @@ class _SignInFormState extends State<SignInForm> {
                                   ),
                                 )
                               : const Text(
-                                  'Login',
+                                  'Sign In',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -189,7 +167,7 @@ class _SignInFormState extends State<SignInForm> {
                 ),
                 const SizedBox(height: 16),
 
-                // Ссылка на регистрацию
+                // Link to registration
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -204,7 +182,7 @@ class _SignInFormState extends State<SignInForm> {
                               widget.tabController.animateTo(1);
                             },
                       child: const Text(
-                        'Register',
+                        'Sign Up',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -222,30 +200,30 @@ class _SignInFormState extends State<SignInForm> {
     );
   }
 
-  /// Вход в систему
+  /// Sign in to the system
   void _signIn() {
     final login = _loginController.text.trim();
     final password = _passwordController.text.trim();
 
-    // Запускаем валидацию всех полей
+    // Validate all fields
     _validateLogin(login);
     _validatePassword(password);
 
-    // Проверяем, есть ли ошибки валидации
+    // Check if there are validation errors
     if (_loginError != null || _passwordError != null) {
       _showValidationError('Please fix the validation errors');
       return;
     }
 
-    // Создаем данные для входа
+    // Create sign in data
     final signInData = SignInData(login: login, password: password);
 
-    // Выполняем вход через Riverpod
+    // Perform sign in through Riverpod
     final container = ProviderScope.containerOf(context);
     container.read(authNotifierProvider.notifier).signIn(signInData);
   }
 
-  /// Показать ошибку валидации
+  /// Show validation error
   void _showValidationError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -257,20 +235,20 @@ class _SignInFormState extends State<SignInForm> {
     );
   }
 
-  /// Валидация логина
+  /// Validate login
   void _validateLogin(String value) {
     setState(() {
       if (value.isEmpty) {
-        _loginError = 'Login is required';
+        _loginError = 'Username is required';
       } else if (value.length < 3) {
-        _loginError = 'Login must be at least 3 characters';
+        _loginError = 'Username must be at least 3 characters';
       } else {
         _loginError = null;
       }
     });
   }
 
-  /// Валидация пароля
+  /// Validate password
   void _validatePassword(String value) {
     setState(() {
       if (value.isEmpty) {

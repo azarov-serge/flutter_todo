@@ -68,7 +68,7 @@ class _AuthPageState extends ConsumerState<AuthPage>
           end: Alignment.bottomCenter,
           colors: [
             Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withOpacity(0.8),
+            Theme.of(context).primaryColor.withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -77,7 +77,7 @@ class _AuthPageState extends ConsumerState<AuthPage>
           children: [
             // Header
             _buildHeader(),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
 
             // Tabs for switching between sign in and sign up
             _buildTabs(),
@@ -114,7 +114,7 @@ class _AuthPageState extends ConsumerState<AuthPage>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -130,7 +130,7 @@ class _AuthPageState extends ConsumerState<AuthPage>
 
           // App name
           Text(
-            'Todo App',
+            'TODO',
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -145,7 +145,7 @@ class _AuthPageState extends ConsumerState<AuthPage>
             'Manage your tasks efficiently',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               letterSpacing: 0.5,
             ),
           ),
@@ -159,14 +159,16 @@ class _AuthPageState extends ConsumerState<AuthPage>
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: TabBar(
+        controller: _tabController,
         indicator: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
         ),
+        dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
         labelColor: Theme.of(context).primaryColor,
         unselectedLabelColor: Colors.white,
