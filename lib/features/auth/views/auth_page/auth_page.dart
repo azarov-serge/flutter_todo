@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_todo/features/auth/providers/auth_notifier.dart';
+import 'package:flutter_todo/features/auth/providers/auth_query.dart';
+import 'package:flutter_todo/shared/providers/request_provider.dart';
+import 'package:flutter_todo/shared/ui_kit/splash_screen/splash_screen.dart';
+import 'package:flutter_todo/app/routes.dart';
+import 'package:flutter_todo/features/auth/views/auth_page/auth_page_view.dart';
 
-import '../../../../app/routes.dart';
-import '../../providers/auth_notifier.dart';
-import 'widgets/widgets.dart';
-
-/// Authentication page with sign in and sign up capabilities
+/// Smart wrapper that handles authentication logic and redirects
+/// Separates business logic from UI presentation
 class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
 
@@ -13,175 +16,40 @@ class AuthPage extends ConsumerStatefulWidget {
   ConsumerState<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends ConsumerState<AuthPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    // Check authentication when state changes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAuthAndRedirect();
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _checkAuthAndRedirect();
-  }
-
-  /// Check authentication and redirect if needed
-  void _checkAuthAndRedirect() {
-    final isAuthenticated = ref.read(isAuthenticatedProvider);
-    if (isAuthenticated) {
-      _redirectToHome();
-    }
-  }
-
-  /// Redirect to home page
-  void _redirectToHome() {
-    if (mounted) {
-      AppRoutes.goHome(context);
-    }
-  }
+class _AuthPageState extends ConsumerState<AuthPage> {
+  bool _hasRedirected = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: _buildContent());
-  }
-
-  /// Build main content
-  Widget _buildContent() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Theme.of(context).primaryColor,
-            Theme.of(context).primaryColor.withValues(alpha: 0.8),
-          ],
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            _buildHeader(),
-            const SizedBox(height: 20),
-
-            // Tabs for switching between sign in and sign up
-            _buildTabs(),
-            const SizedBox(height: 20),
-
-            // Tab content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  SignInForm(tabController: _tabController),
-                  SignUpForm(tabController: _tabController),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    final isAuthenticated = ref.watch(isAuthenticatedProvider);
+    final checkAuthQuery = AuthQuery.checkAuth();
+    final requestState = ref.watch(
+      requestStateProvider(checkAuthQuery.state.key),
     );
-  }
+    final isLoading = requestState.isLoading;
 
-  /// Build header
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        children: [
-          // Logo
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.task_alt,
-              size: 40,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          const SizedBox(height: 20),
+    // Show splash screen during authentication check
+    if (isLoading) {
+      return const SplashScreen(message: 'Checking authentication...');
+    }
 
-          // App name
-          Text(
-            'TODO',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
+    // Redirect to home if authenticated
+    if (isAuthenticated && !_hasRedirected) {
+      _hasRedirected = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+      });
+      return const SplashScreen(message: 'Redirecting to home...');
+    }
 
-          // Subtitle
-          Text(
-            'Manage your tasks efficiently',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white.withValues(alpha: 0.9),
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    // Reset redirect flag when not authenticated
+    if (!isAuthenticated) {
+      _hasRedirected = false;
+    }
 
-  /// Build tabs
-  Widget _buildTabs() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        dividerColor: Colors.transparent,
-        indicatorSize: TabBarIndicatorSize.tab,
-        labelColor: Theme.of(context).primaryColor,
-        unselectedLabelColor: Colors.white,
-        labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
-        tabs: const [
-          Tab(text: 'Sign In'),
-          Tab(text: 'Sign Up'),
-        ],
-      ),
-    );
+    // Show auth page if not authenticated
+    return const AuthPageView();
   }
 }

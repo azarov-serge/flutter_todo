@@ -2,6 +2,45 @@
 
 A modern Flutter application for task management with robust state management using Riverpod and feature-based architecture.
 
+## 🚀 Overview
+
+This project demonstrates modern Flutter development practices with a focus on clean architecture, SOLID principles, and scalable state management. The application features a complete authentication system, task management, and category organization with a beautiful Material Design interface.
+
+## 🏗️ Architecture Highlights
+
+### **SOLID Principles Implementation**
+- ✅ **Single Responsibility Principle (SRP)** - Each component has a single, well-defined responsibility
+- ✅ **Open/Closed Principle (OCP)** - Open for extension, closed for modification
+- ✅ **Liskov Substitution Principle (LSP)** - Components are interchangeable
+- ✅ **Interface Segregation Principle (ISP)** - Focused, specific interfaces
+- ✅ **Dependency Inversion Principle (DIP)** - Dependencies on abstractions
+
+### **Smart/Dumb Pattern**
+The application implements the Smart/Dumb pattern to separate business logic from UI presentation:
+
+```dart
+// Smart wrapper (Business Logic)
+class AuthPage extends ConsumerStatefulWidget {
+  // Handles authentication, redirects, state management
+}
+
+// Dumb view (UI only)
+class AuthPageView extends StatefulWidget {
+  // Pure UI rendering, no business logic
+}
+```
+
+### **Feature-Based Architecture**
+Organized by feature domains rather than technical layers:
+
+```
+lib/features/
+├── auth/          # Authentication module
+├── categories/    # Category management
+├── tasks/         # Task management
+└── shared/        # Common components
+```
+
 ## Architecture Overview
 
 ### Riverpod State Management
@@ -287,27 +326,105 @@ ErrorWrapper(
 4. **TaskEditorPage**: Create/edit tasks
 5. **Navigation Drawer**: User profile and sign out
 
-## Key Features
+## 🎯 Key Features
 
-- ✅ **Modern State Management**: Riverpod for type-safe state management
-- ✅ **Feature-Based Architecture**: Modular, maintainable code structure
-- ✅ **Centralized Request Management**: RequestNotifier for all API calls
-- ✅ **Query Factory Pattern**: Type-safe API query definitions
-- ✅ **State Optimization**: Efficient state management without redundancy
-- ✅ **Authentication Flow**: Seamless auth verification and redirects
-- ✅ **Error Handling**: Comprehensive error management with ErrorWrapper
-- ✅ **Pull-to-Refresh**: Refresh data by swiping down
-- ✅ **Real-time Validation**: Form validation with immediate feedback
+### **State Management**
+- ✅ **Riverpod Integration** - Modern, type-safe state management
+- ✅ **RequestNotifier** - Centralized API request state management
+- ✅ **Query Factory Pattern** - Type-safe API query definitions
+- ✅ **State Optimization** - Efficient state management without redundancy
 
-## Getting Started
+### **Architecture & Design**
+- ✅ **Feature-Based Architecture** - Modular, maintainable code structure
+- ✅ **SOLID Principles** - Clean, scalable code following best practices
+- ✅ **Smart/Dumb Pattern** - Separation of business logic and UI
+- ✅ **MVVM Pattern** - ViewModels for UI logic management
 
-This project is a starting point for a Flutter application.
+### **User Experience**
+- ✅ **Authentication Flow** - Seamless auth verification and redirects
+- ✅ **Real-time Validation** - Form validation with immediate feedback
+- ✅ **Pull-to-Refresh** - Refresh data by swiping down
+- ✅ **Error Handling** - Comprehensive error management with ErrorWrapper
+- ✅ **Loading States** - Beautiful loading indicators and splash screens
+- ✅ **Navigation Drawer** - User profile and sign out functionality
 
-A few resources to get you started if this is your first Flutter project:
+### **Technical Excellence**
+- ✅ **Dependency Injection** - GetIt for service management
+- ✅ **Local Storage** - Hive for offline data persistence
+- ✅ **Type Safety** - Full type safety with Dart and Riverpod
+- ✅ **Testability** - Easy to test components in isolation
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🚀 Getting Started
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### **Prerequisites**
+- Flutter SDK (latest stable version)
+- Dart SDK
+- iOS Simulator / Android Emulator or physical device
+
+### **Installation**
+```bash
+# Clone the repository
+git clone https://github.com/your-username/flutter_todo.git
+
+# Navigate to project directory
+cd flutter_todo
+
+# Install dependencies
+flutter pub get
+
+# Run the application
+flutter run
+```
+
+### **Project Structure**
+```
+lib/
+├── features/           # Feature-based modules
+│   ├── auth/          # Authentication
+│   ├── categories/    # Category management
+│   ├── tasks/         # Task management
+│   └── shared/        # Common components
+├── shared/            # Shared utilities
+│   ├── providers/     # Global providers
+│   ├── widgets/       # Reusable widgets
+│   └── ui_kit/        # UI components
+└── app/               # App configuration
+```
+
+## 📚 Documentation
+
+- **[ARCH.md](./ARCH.md)** - Detailed architecture documentation (Russian)
+- **[AUTH_ARCHITECTURE.md](./AUTH_ARCHITECTURE.md)** - Authentication architecture guide
+
+## 🛠️ Development
+
+### **Adding New Features**
+1. Create feature directory in `lib/features/`
+2. Add providers for state management
+3. Create views with Smart/Dumb pattern
+4. Update routes and navigation
+
+### **Testing**
+```bash
+# Run all tests
+flutter test
+
+# Run specific test file
+flutter test test/feature_test.dart
+```
+
+## 📱 Screenshots
+
+*[Add screenshots of the application here]*
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
